@@ -1,5 +1,6 @@
 {
   "name": "doodlewithmates",
   "dependencies": {
+    "urijs": "^1.18.8"
   }
 }

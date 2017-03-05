@@ -1,0 +1,28 @@
+<section class="hero">
+  <div class="hero-body">
+    <div class="container">
+      <header class="has-text-centered">
+        <h1 class="title">
+          <!-- image goes here -->
+          <span class="sr-only">Doodle with m8s!</span>
+        </h1>
+      </header>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <main class="main">
+      <div class="holder">
+        <div class="user-holder holder-item">
+          {{user-list list=model}}
+        </div>
+        <div class="canvas-holder holder-item">
+          {{canvas-panel}}
+        </div>
+      </div>
+    </main>
+  </div>
+</section>
+{{logout-button}}
+{{outlet}}

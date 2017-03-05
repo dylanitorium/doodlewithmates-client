@@ -1,0 +1,54 @@
+@import '../../vendor/bulma/bulma';
+
+
+.main {
+  display: flex;
+  justify-content: center;
+}
+
+.holder {
+  &::before,
+  &::after {
+    display: table;
+    content: '';
+  }
+
+  &::after{
+    clear: both;
+  }
+}
+
+.holder-item {
+  float: left;
+}
+
+.user-holder {
+  max-width: 250px;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  padding-right: 1rem;
+  margin-top: 1px;
+
+  img {
+    margin: 0.5rem;
+    border: 0.5rem solid white;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+  }
+}
+
+.login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.icon {
+  margin-right: 0.5rem;
+}

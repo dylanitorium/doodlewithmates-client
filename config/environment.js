@@ -1,8 +1,8 @@
 /* jshint node: true */
-
 module.exports = function(environment) {
   var ENV = {
     modulePrefix: 'doodlewithmates',
+    podModulePrefix: 'doodlewithmates/features',
     environment: environment,
     rootURL: '/',
     locationType: 'auto',
@@ -24,11 +24,10 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
-    // ENV.APP.LOG_RESOLVER = true;
-    // ENV.APP.LOG_ACTIVE_GENERATION = true;
-    // ENV.APP.LOG_TRANSITIONS = true;
-    // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
-    // ENV.APP.LOG_VIEW_LOOKUPS = true;
+    ENV.APP.SERVER = 'http://localhost:8080';
+
+    ENV.APP.FACEBOOK_REDIRECT = 'http://localhost:4300/';
+    ENV.APP.FACEBOOK_APP_ID = '742896385870748';
   }
 
   if (environment === 'test') {
@@ -45,6 +44,26 @@ module.exports = function(environment) {
   if (environment === 'production') {
 
   }
+
+  ENV['ember-simple-auth'] = {
+    authorizer: 'authorizer:custom',
+    routeAfterAuthentication: '/'
+  };
+
+  ENV['ember-cli-mirage'] = {
+    enabled: false
+  };
+
+
+  ENV.torii = {
+    providers: {
+      'facebook-oauth2': {
+        apiKey: ENV.APP.FACEBOOK_APP_ID,
+        redirectUri: ENV.APP.FACEBOOK_REDIRECT
+      }
+    }
+  };
+
 
   return ENV;
 };
