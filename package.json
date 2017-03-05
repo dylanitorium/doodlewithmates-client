@@ -1,14 +1,14 @@
 {
-  "name": "doodlewithmates",
+  "name": "doodle-with-mates-client",
   "version": "0.0.0",
-  "description": "Small description for doodlewithmates goes here",
+  "description": "Simple ember real time whiteboard",
   "license": "MIT",
   "author": "",
   "directories": {
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "",
+  "repository": "https://github.com/dylanitorium/doodlewithmates-client",
   "scripts": {
     "build": "ember build",
     "start": "ember server",
