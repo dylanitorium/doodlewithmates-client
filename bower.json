@@ -1,6 +1,7 @@
 {
   "name": "doodlewithmates",
   "dependencies": {
-    "urijs": "^1.18.8"
+    "urijs": "^1.18.8",
+    "socket.io-client": "^1.7.2"
   }
 }
