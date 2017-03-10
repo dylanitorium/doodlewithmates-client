@@ -12,6 +12,7 @@ export default Ember.Component.extend({
   attributeBindings: ['width','height', 'id', 'style'],
 
   // State
+  paths: [],
   isDrawing: false,
   isFirstContact: false,
   xCoordinates: [],
@@ -22,6 +23,17 @@ export default Ember.Component.extend({
   strokeSize: '3',
 
   // Functions
+  emitDraw: function () {
+    const payload = {
+      token: this.get('session.data.authenticated.token'),
+      path: this.getProperties(
+        'xCoordinates',
+        'yCoordinates',
+        'dragCoordinates'
+      ),
+    };
+    this.get('socket').emit('draw', payload);
+  },
   getOffset: function (element) {
     element = element.getBoundingClientRect();
     return {
@@ -39,6 +51,7 @@ export default Ember.Component.extend({
     this.get('xCoordinates').pushObject(x);
     this.get('yCoordinates').pushObject(y);
     this.get('dragCoordinates').pushObject(isDragging);
+    this.emitDraw();
   },
   redraw: function () {
     const {
