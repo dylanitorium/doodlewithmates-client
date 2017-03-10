@@ -19,7 +19,6 @@ export default Ember.Component.extend({
   dragCoordinates: [],
   canvas: null,
   canvasContext: null,
-  strokeColour: 'black',
   strokeSize: '3',
 
   // Functions
@@ -54,7 +53,7 @@ export default Ember.Component.extend({
       'dragCoordinates'
     );
     canvasContext.clearRect(0, 0, this.get('width'), this.get('height')); // Clears the canvas
-    canvasContext.strokeStyle = this.get('strokeColour');
+    canvasContext.strokeStyle = this.get('color');
     canvasContext.lineJoin = 'round';
     canvasContext.lineWidth = this.get('strokeSize');
 

@@ -1,12 +1,23 @@
 <section class="hero">
-  <div class="hero-body">
+  <div class="hero-head">
     <div class="container">
-      <header class="has-text-centered">
-        <h1 class="title">
-          <!-- image goes here -->
-          <span class="sr-only">Doodle with m8s!</span>
-        </h1>
-      </header>
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="nav-item">
+            Doodle With Mates
+          </div>
+        </div>
+
+        <div class="nav-center">
+
+        </div>
+
+        <div class="nav-right nav-menu">
+          <div class="nav-item">
+            {{logout-button}}
+          </div>
+        </div>
+      </nav>
     </div>
   </div>
 </section>
@@ -15,14 +26,13 @@
     <main class="main">
       <div class="holder">
         <div class="user-holder holder-item">
-          {{user-list list=model}}
+          {{user-list users=users}}
         </div>
         <div class="canvas-holder holder-item">
-          {{canvas-panel}}
+          {{canvas-panel color=color layers=users}}
         </div>
       </div>
     </main>
   </div>
 </section>
-{{logout-button}}
 {{outlet}}
