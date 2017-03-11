@@ -1,39 +1,88 @@
 import Ember from 'ember';
+import _ from 'lodash';
 
 const { inject: { service }, Component } = Ember;
 
 export default Ember.Component.extend({
   session:     service(),
+
   // Element
   tagName: 'canvas',
   width: 600,
   height: 300,
-  style: 'border: 1px solid ;',
+  style: 'border: 1px solid black;',
   attributeBindings: ['width','height', 'id', 'style'],
 
   // State
-  paths: [],
+  paths: {},
   isDrawing: false,
-  isFirstContact: false,
-  xCoordinates: [],
-  yCoordinates: [],
-  dragCoordinates: [],
   canvas: null,
   canvasContext: null,
   strokeSize: '3',
 
-  // Functions
-  emitDraw: function () {
-    const payload = {
-      token: this.get('session.data.authenticated.token'),
-      path: this.getProperties(
-        'xCoordinates',
-        'yCoordinates',
-        'dragCoordinates'
-      ),
-    };
-    this.get('socket').emit('draw', payload);
+  //Util
+  addToArray: function (array, value) {
+    array.push(value);
+    return array;
   },
+
+  // Path Handling
+  createEmptyPath: function (color) {
+    return {
+      color: color || '#333',
+      xCoordinates: [],
+      yCoordinates: [],
+      dragCoordinates: [],
+    }
+  },
+  getAllPathsAsArray: function () {
+    return _.map(this.get('paths'));
+  },
+  addToMyPath: function(x, y, drag) {
+    const user = this.get('session.data.authenticated.account');
+    const path = this.addToUserPath(user, x, y, drag);
+    this.emitDraw({
+      id: user.id,
+      path,
+    });
+  },
+  addToUserPath: function(user, x, y, drag) {
+    const paths = this.get('paths');
+    const { id, color } = user.getProperties('id', 'color');
+    const path = (this.doesPathExistForId(id)) ? paths[id] : this.createEmptyPath(color);
+    this.set('paths', Object.assign({}, paths, {
+      [id]: this.addToPath(path, x, y, drag),
+    }));
+    return path;
+  },
+  addOrReplacePath: function (id, path) {
+    this.set('paths', Object.assign({}, this.get('paths'), {
+      [id]: path,
+    }));
+  },
+  addToPath: function (path, x, y, drag) {
+    const { xCoordinates, yCoordinates, dragCoordinates } = path;
+    return Object.assign({}, path, {
+      xCoordinates: [...xCoordinates, x],
+      yCoordinates: [...yCoordinates, y],
+      dragCoordinates: [...dragCoordinates, drag],
+    })
+  },
+  doesPathExistForId: function (id) {
+    const paths = this.get('paths');
+    return typeof paths[id] !== 'undefined';
+  },
+  // ====================================
+  /* Sockect Events */
+  emitDraw: function (payload) {
+    this.get('socket').emit('draw:progress', payload);
+  },
+  emitDrawEnd: function () {
+    const payload = {};
+    this.get('socket').emit('draw:end', payload);
+  },
+
+  /* Canvas Helpers */
   getOffset: function (element) {
     element = element.getBoundingClientRect();
     return {
@@ -47,58 +96,69 @@ export default Ember.Component.extend({
   getXLocation: function ({ pageX }) {
     return pageX - this.getOffset(this.get('canvas')).left;
   },
-  addToPath: function (x, y, isDragging) {
-    this.get('xCoordinates').pushObject(x);
-    this.get('yCoordinates').pushObject(y);
-    this.get('dragCoordinates').pushObject(isDragging);
-    this.emitDraw();
-  },
-  redraw: function () {
-    const {
-      canvasContext,
-      xCoordinates,
-      yCoordinates,
-      dragCoordinates,
-    } = this.getProperties(
-      'canvasContext',
-      'xCoordinates',
-      'yCoordinates',
-      'dragCoordinates'
-    );
-    canvasContext.clearRect(0, 0, this.get('width'), this.get('height')); // Clears the canvas
-    canvasContext.strokeStyle = this.get('color');
-    canvasContext.lineJoin = 'round';
-    canvasContext.lineWidth = this.get('strokeSize');
 
-    for (let index = 0; index < xCoordinates.length; index++) {
-      canvasContext.beginPath();
-      if (dragCoordinates[index] && index) {
-        canvasContext.moveTo(xCoordinates[index-1], yCoordinates[index-1]);
-       } else {
-        canvasContext.moveTo(xCoordinates[index]-1, yCoordinates[index]);
-       }
-       canvasContext.lineTo(xCoordinates[index], yCoordinates[index]);
-       canvasContext.closePath();
-       canvasContext.stroke();
+  // ====================================
+  /* Drawing */
+  clearCanvas: function () {
+    this.get('canvasContext').clearRect(0, 0, this.get('width'), this.get('height'));
+  },
+  drawPath: function() {
+    const canvasContext = this.get('canvasContext');
+    canvasContext.lineJoin = 'round';
+    canvasContext.lineWidth = 3;
+    return function (path) {
+      const { xCoordinates, dragCoordinates, yCoordinates, color } = path;
+      canvasContext.strokeStyle = color;
+      for (let index = 0; index < xCoordinates.length; index++) {
+        canvasContext.beginPath();
+        if (dragCoordinates[index] && index) {
+          canvasContext.moveTo(xCoordinates[index-1], yCoordinates[index-1]);
+         } else {
+          canvasContext.moveTo(xCoordinates[index]-1, yCoordinates[index]);
+         }
+         canvasContext.lineTo(xCoordinates[index], yCoordinates[index]);
+         canvasContext.closePath();
+         canvasContext.stroke();
+      }
     }
   },
+  redraw: function () {
+    _.each(this.getAllPathsAsArray(), this.drawPath());
+  },
+
+  // ====================================
+  /* Sockets */
+  subscribeToChanges: function () {
+    this.get('socket').on('draw:change', this.handleCanvasUpdate(this));
+  },
+  handleCanvasUpdate: function (self) {
+    return function ({ id, path }) {
+      self.addOrReplacePath(id, path);
+      self.redraw();
+    }
+  },
+
+  // ====================================
+  /* Element */
   didInsertElement: function () {
     this.set('canvas',  this.get('element'));
     this.set('canvasContext', this.get('canvas').getContext('2d'));
+    this.subscribeToChanges();
   },
   mouseDown: function(event) {
     this.set('isDrawing', true);
-    this.addToPath(this.getXLocation(event), this.getYLocation(event));
+    this.addToMyPath(this.getXLocation(event), this.getYLocation(event));
     this.redraw();
   },
   mouseMove: function(event) {
     if (this.get('isDrawing')) {
-      this.addToPath(this.getXLocation(event), this.getYLocation(event), true);
+      this.addToMyPath(this.getXLocation(event), this.getYLocation(event), true);
       this.redraw();
     }
   },
   mouseUp: function(event) {
     this.set('isDrawing', false);
+    this.emitDrawEnd();
   },
   mouseLeave: function(event) {
     this.set('isDrawing', false);

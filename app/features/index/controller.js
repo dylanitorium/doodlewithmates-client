@@ -16,18 +16,24 @@ export default Ember.Controller.extend({
       this.set('color', new_val.color);
     }
   },
-  init: function () {
-    this._super.apply(this, arguments);
+  setSessionUser: function () {
     this.get('store').query('user', { token: this.get('session.data.authenticated.token') }).then((users) => {
       const user = users.get('firstObject');
       this.set('session.data.authenticated.account', user);
     });
+  },
+  init: function () {
+    this._super.apply(this, arguments);
+    this.setSessionUser();
     this.set('socket', this.get('socketIo').socketFor('http://localhost:8080'));
     this.get('socket').emit('afterConnection', this.get('session.data.authenticated.token'));
-    this.get('socket').on('update', (data) => {
+    this.get('socket').on('user:change', (data) => {
       this.setColorIfShould(data);
+      console.log('user:change');
       this.get('users').update();
     });
+
   }
+
 
 });
