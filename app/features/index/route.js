@@ -3,7 +3,7 @@ import RSVP from 'rsvp';
 import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
 export default Ember.Route.extend(AuthenticatedRouteMixin, {
-  model() {
+  model: function() {
     return RSVP.hash({
       users: this.get('store').query('user', {active: true}),
     })

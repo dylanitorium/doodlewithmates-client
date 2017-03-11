@@ -5,6 +5,7 @@ const { inject: { service }, Component } = Ember;
 
 export default Ember.Component.extend({
   session:     service(),
+  store: service(),
 
   // Element
   tagName: 'canvas',
@@ -20,13 +21,22 @@ export default Ember.Component.extend({
   canvasContext: null,
   strokeSize: '3',
 
-  //Util
-  addToArray: function (array, value) {
-    array.push(value);
-    return array;
+  // ====================================
+  /* Path Handling */
+  initPaths: function () {
+    const users = this.get('users');
+    users.forEach(this.initUserPath());
+    this.redraw();
   },
-
-  // Path Handling
+  initUserPath: function () {
+    const self = this;
+    return function (user) {
+      const { id, path } = user.getProperties('id', 'path');
+      console.log(id);
+      console.log(path);
+      self.addOrReplacePath(id, path);
+    }
+  },
   createEmptyPath: function (color) {
     return {
       color: color || '#333',
@@ -46,6 +56,10 @@ export default Ember.Component.extend({
       path,
     });
   },
+  getMyPath: function () {
+    const user = this.get('session.data.authenticated.account');
+    return this.getUserPath(user.id);
+  },
   addToUserPath: function(user, x, y, drag) {
     const paths = this.get('paths');
     const { id, color } = user.getProperties('id', 'color');
@@ -55,9 +69,13 @@ export default Ember.Component.extend({
     }));
     return path;
   },
+  getUserPath: function (id) {
+    const paths = this.get('paths');
+    return paths[id];
+  },
   addOrReplacePath: function (id, path) {
     this.set('paths', Object.assign({}, this.get('paths'), {
-      [id]: path,
+      [id]: path || this.createEmptyPath(),
     }));
   },
   addToPath: function (path, x, y, drag) {
@@ -77,11 +95,10 @@ export default Ember.Component.extend({
   emitDraw: function (payload) {
     this.get('socket').emit('draw:progress', payload);
   },
-  emitDrawEnd: function () {
-    const payload = {};
+  emitDrawEnd: function (payload) {
     this.get('socket').emit('draw:end', payload);
   },
-
+  // ====================================
   /* Canvas Helpers */
   getOffset: function (element) {
     element = element.getBoundingClientRect();
@@ -96,7 +113,6 @@ export default Ember.Component.extend({
   getXLocation: function ({ pageX }) {
     return pageX - this.getOffset(this.get('canvas')).left;
   },
-
   // ====================================
   /* Drawing */
   clearCanvas: function () {
@@ -113,28 +129,43 @@ export default Ember.Component.extend({
         canvasContext.beginPath();
         if (dragCoordinates[index] && index) {
           canvasContext.moveTo(xCoordinates[index-1], yCoordinates[index-1]);
-         } else {
+        } else {
           canvasContext.moveTo(xCoordinates[index]-1, yCoordinates[index]);
-         }
-         canvasContext.lineTo(xCoordinates[index], yCoordinates[index]);
-         canvasContext.closePath();
-         canvasContext.stroke();
+        }
+        canvasContext.lineTo(xCoordinates[index], yCoordinates[index]);
+        canvasContext.closePath();
+        canvasContext.stroke();
       }
     }
   },
   redraw: function () {
+    this.clearCanvas();
     _.each(this.getAllPathsAsArray(), this.drawPath());
   },
 
   // ====================================
   /* Sockets */
   subscribeToChanges: function () {
-    this.get('socket').on('draw:change', this.handleCanvasUpdate(this));
+    this.get('socket').on('draw:change', this.handleCanvasUpdate());
+    this.get('socket').on('user:change', this.handleUserChange());
   },
-  handleCanvasUpdate: function (self) {
+  handleCanvasUpdate: function () {
+    const self = this;
     return function ({ id, path }) {
       self.addOrReplacePath(id, path);
       self.redraw();
+    }
+  },
+  handleUserChange: function () {
+    const self = this;
+    return function (data) {
+      console.log(data);
+      const { new_val: { active, id } } = data;
+      if(!active) {
+
+        self.addOrReplacePath(id, null);
+        self.redraw();
+      }
     }
   },
 
@@ -143,6 +174,7 @@ export default Ember.Component.extend({
   didInsertElement: function () {
     this.set('canvas',  this.get('element'));
     this.set('canvasContext', this.get('canvas').getContext('2d'));
+    this.initPaths();
     this.subscribeToChanges();
   },
   mouseDown: function(event) {
@@ -158,7 +190,12 @@ export default Ember.Component.extend({
   },
   mouseUp: function(event) {
     this.set('isDrawing', false);
-    this.emitDrawEnd();
+    const user = this.get('session.data.authenticated.account');
+    const path = this.getMyPath();
+    this.emitDrawEnd({
+      id: user.id,
+      path,
+    });
   },
   mouseLeave: function(event) {
     this.set('isDrawing', false);
