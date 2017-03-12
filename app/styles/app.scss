@@ -1,5 +1,9 @@
 @import '../../vendor/bulma/bulma';
 
+//override
+.nav-item img {
+  max-height: none;
+}
 
 .main {
   display: flex;
@@ -26,18 +30,23 @@
   max-width: 250px;
 }
 
+.user-list {
+  li {
+    float: left;
+  }
+}
+
 .user-item {
   display: flex;
   align-items: center;
-  padding-right: 1rem;
   margin-top: 1px;
 
   img {
-    margin: 0.5rem;
-    border: 0.5rem solid white;
+    margin: 0.5rem 0.5rem 0.5rem 0;
+    border: 0.3rem solid white;
     border-radius: 50%;
-    width: 70px;
-    height: 70px;
+    width: 40px;
+    height: 40px;
   }
 }
 

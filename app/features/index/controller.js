@@ -29,7 +29,7 @@ export default Ember.Controller.extend({
     this.get('socket').emit('afterConnection', this.get('session.data.authenticated.token'));
     this.get('socket').on('user:change', (data) => {
       this.setColorIfShould(data);
-      console.log('user:change');
+      
       this.get('users').update();
     });
 

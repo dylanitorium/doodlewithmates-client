@@ -9,9 +9,9 @@ export default Ember.Component.extend({
 
   // Element
   tagName: 'canvas',
-  width: 600,
-  height: 300,
-  style: 'border: 1px solid black;',
+  width: 1200,
+  height: 440,
+  style: 'border: 1px solid black; margin-top: 30px;',
   attributeBindings: ['width','height', 'id', 'style'],
 
   // State
@@ -32,8 +32,6 @@ export default Ember.Component.extend({
     const self = this;
     return function (user) {
       const { id, path } = user.getProperties('id', 'path');
-      console.log(id);
-      console.log(path);
       self.addOrReplacePath(id, path);
     }
   },
@@ -159,7 +157,6 @@ export default Ember.Component.extend({
   handleUserChange: function () {
     const self = this;
     return function (data) {
-      console.log(data);
       const { new_val: { active, id } } = data;
       if(!active) {
 
@@ -200,5 +197,4 @@ export default Ember.Component.extend({
   mouseLeave: function(event) {
     this.set('isDrawing', false);
   },
-
 });

@@ -6,6 +6,9 @@
           <div class="nav-item">
             Doodle With Mates
           </div>
+          <div class="nav-item">
+            {{user-list users=users}}
+          </div>
         </div>
 
         <div class="nav-center">
@@ -21,13 +24,10 @@
     </div>
   </div>
 </section>
-<section class="section">
+<section>
   <div class="container">
     <main class="main">
       <div class="holder">
-        <div class="user-holder holder-item">
-          {{user-list users=users}}
-        </div>
         <div class="canvas-holder holder-item">
           {{canvas-panel color=color socket=socket users=users}}
         </div>
