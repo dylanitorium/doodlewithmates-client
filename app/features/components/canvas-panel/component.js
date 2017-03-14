@@ -4,7 +4,7 @@ import _ from 'lodash';
 const { inject: { service }, Component } = Ember;
 
 export default Ember.Component.extend({
-  session: service(),
+  sessionAccount: service('session-account'),
   store: service(),
 
   // Element
@@ -47,16 +47,16 @@ export default Ember.Component.extend({
     return _.map(this.get('paths'));
   },
   addToMyPath: function(x, y, drag) {
-    const user = this.get('session.data.authenticated.account');
+    const user = this.get('sessionAccount').get('account');
     const path = this.addToUserPath(user, x, y, drag);
     this.emitDraw({
-      id: user.id,
+      id: user.get('id'),
       path,
     });
   },
   getMyPath: function () {
-    const user = this.get('session.data.authenticated.account');
-    return this.getUserPath(user.id);
+    const user = this.get('sessionAccount').get('account');
+    return this.getUserPath(user.get('id'));
   },
   addToUserPath: function(user, x, y, drag) {
     const paths = this.get('paths');
@@ -187,10 +187,10 @@ export default Ember.Component.extend({
   },
   mouseUp: function(event) {
     this.set('isDrawing', false);
-    const user = this.get('session.data.authenticated.account');
+    const user = this.get('sessionAccount').get('account');
     const path = this.getMyPath();
     this.emitDrawEnd({
-      id: user.id,
+      id: user.get('id'),
       path,
     });
   },
