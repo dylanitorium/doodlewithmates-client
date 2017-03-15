@@ -5,4 +5,5 @@ export default DS.Model.extend({
   name: DS.attr(),
   color: DS.attr(),
   path: DS.attr(),
+  active: DS.attr(),
 });

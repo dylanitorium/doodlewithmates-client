@@ -145,7 +145,7 @@ export default Ember.Component.extend({
   /* Sockets */
   subscribeToChanges: function () {
     this.get('socket').on('draw:change', this.handleCanvasUpdate());
-    this.get('socket').on('user:change', this.handleUserChange());
+    this.get('socket').on('user:deactivate', this.handleUserChange());
   },
   handleCanvasUpdate: function () {
     const self = this;
@@ -157,12 +157,9 @@ export default Ember.Component.extend({
   handleUserChange: function () {
     const self = this;
     return function (data) {
-      const { new_val: { active, id } } = data;
-      if(!active) {
-
-        self.addOrReplacePath(id, null);
-        self.redraw();
-      }
+      const { new_val: { id } } = data;
+      self.addOrReplacePath(id, null);
+      self.redraw();
     }
   },
 

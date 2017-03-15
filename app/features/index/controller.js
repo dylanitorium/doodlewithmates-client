@@ -10,10 +10,6 @@ export default Ember.Controller.extend({
   sessionAccount: service('session-account'),
   socket: null,
   color: '#333',
-  userList: Ember.computed('users', function () {
-    const user = this.get('sessionAccount').get('account');
-    return this.get('store').filter('user', (item) => (user.get('id') !== item.get('id')));
-  }),
   currentUser: Ember.computed('sessionAccount', function () {
     return this.get('sessionAccount').get('account');
   }),
