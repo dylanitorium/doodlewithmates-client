@@ -10,11 +10,9 @@ export default Service.extend({
   loadCurrentUser() {
     return new RSVP.Promise((resolve, reject) => {
       const token = this.get('session.data.authenticated.token');
-      console.log(token);
       if (token) {
         this.get('store').query('user', { token }).then((users) => {
           const user = users.get('firstObject');
-          console.log(user);
           this.set('account', user);
           resolve();
         }, reject);

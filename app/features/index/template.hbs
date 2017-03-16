@@ -17,8 +17,10 @@
 
         <div class="nav-right nav-menu">
           <div class="nav-item">
-            {{user-item user=currentUser}}
-            {{logout-button}}
+            {{#if sessionAccount.account }}
+              {{user-item user=sessionAccount.account}}
+              {{logout-button}}
+            {{/if}}
           </div>
         </div>
       </nav>
