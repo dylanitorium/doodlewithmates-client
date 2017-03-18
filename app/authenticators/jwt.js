@@ -31,8 +31,8 @@ export default Torii.extend({
         dataType: 'json'
       }).then((response) => ({
         token: response.token,
-      }))
-    ));
+      })
+    )));
   },
 
   invalidate(data) {

@@ -7,4 +7,5 @@ export default DS.JSONAPIAdapter.extend(DataAdapterMixin, {
   authorizer: 'authorizer:oauth2',
   namespace: 'api',
   host: config.APP.SERVER,
+  
 });

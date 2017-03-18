@@ -11,12 +11,12 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
     const self = this;
     return function (item) {
       const currentUser = self.get('sessionAccount').get('account');
-      return (item.get('active') === true && item.get('id') !== currentUser.get('id'));
+      return (item.get('isActive') === true && item.get('id') !== currentUser.get('id'));
     }
   },
   model: function() {
     return RSVP.hash({
-      users: this.get('store').filter('user', this.filterUsers()),
+      users: this.get('sessionAccount').loadCurrentUser().then(() => this.get('store').filter('user', this.filterUsers())),
     })
   },
   setupController(controller, models) {
