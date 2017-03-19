@@ -145,7 +145,7 @@ export default Ember.Component.extend({
   /* Sockets */
   subscribeToChanges: function () {
     this.get('socket').on('draw:change', this.handleCanvasUpdate());
-    this.get('socket').on('user:deactivate', this.handleUserChange());
+    this.get('socket').on('user:deactivated', this.handleUserChange());
   },
   handleCanvasUpdate: function () {
     const self = this;
@@ -187,7 +187,7 @@ export default Ember.Component.extend({
     const user = this.get('sessionAccount').get('account');
     const path = this.getMyPath();
     this.emitDrawEnd({
-      id: user.get('id'),
+      fbid: user.get('id'),
       path,
     });
   },
