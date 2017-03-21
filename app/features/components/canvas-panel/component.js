@@ -157,8 +157,8 @@ export default Ember.Component.extend({
   handleUserChange: function () {
     const self = this;
     return function (data) {
-      const { id } = data;
-      self.addOrReplacePath(id, null);
+      const { fbid } = data;
+      self.addOrReplacePath(fbid, null);
       self.redraw();
     }
   },
