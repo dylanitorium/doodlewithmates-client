@@ -17,6 +17,7 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
   model: function() {
     return RSVP.hash({
       users: this.get('sessionAccount').loadCurrentUser().then(() => this.get('store').filter('user', this.filterUsers())),
+      canvasUsers: this.get('store').findAll('user'),
     })
   },
   setupController(controller, models) {

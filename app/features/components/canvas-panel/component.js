@@ -31,8 +31,8 @@ export default Ember.Component.extend({
   initUserPath: function () {
     const self = this;
     return function (user) {
-      const { id, path } = user.getProperties('id', 'path');
-      self.addOrReplacePath(id, path);
+      const { id, path, color } = user.getProperties('id', 'path', 'color');
+      self.addOrReplacePath(id, path, color);
     }
   },
   createEmptyPath: function (color) {
@@ -41,6 +41,21 @@ export default Ember.Component.extend({
       xCoordinates: [],
       yCoordinates: [],
       dragCoordinates: [],
+    }
+  },
+  getFormattedPath: function(id, path, color) {
+    const paths = this.get('paths');
+    if (this.doesPathExistForId(id)) {
+      return {
+        color: paths[id].color,
+        ...path
+      };
+    } else {
+      if(!path) {
+        return this.createEmptyPath(color);
+      } else {
+        return { ...path, color };
+      }
     }
   },
   getAllPathsAsArray: function () {
@@ -71,9 +86,9 @@ export default Ember.Component.extend({
     const paths = this.get('paths');
     return paths[id];
   },
-  addOrReplacePath: function (id, path) {
+  addOrReplacePath: function (id, path, color) {
     this.set('paths', Object.assign({}, this.get('paths'), {
-      [id]: path || this.createEmptyPath(),
+      [id]: this.getFormattedPath(id, path, color),
     }));
   },
   addToPath: function (path, x, y, drag) {
