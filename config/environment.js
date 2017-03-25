@@ -41,6 +41,8 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
+    ENV.APP.SERVER = 'http://localhost:8080';
+    ENV.APP.FACEBOOK_APP_ID = '742896385870748';
     ENV.APP.FACEBOOK_REDIRECT = 'https://doodlewithmates.xyz';
   }
 
