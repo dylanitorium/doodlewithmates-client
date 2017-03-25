@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import config from '../../../config/environment';
 
 const { inject: { service } } = Ember;
 
@@ -12,7 +13,7 @@ export default Ember.Controller.extend({
   color: '#333',
   init: function () {
     this._super.apply(this, arguments);
-    this.set('socket', this.get('socketIo').socketFor('http://localhost:8080'));
+    this.set('socket', this.get('socketIo').socketFor(config.APP.SERVER));
     this.get('socket').emit('afterConnection', this.get('session.data.authenticated.token'));
     this.get('socket').on('user:activated', (data) => {
       this.get('users').update();
