@@ -3,6 +3,3 @@ os: linux
 files:
   - source: /
     destination: /var/www/dwmc/
-hooks:
-  AfterInstall:
-    - location: /var/www/dwmc/start.sh
