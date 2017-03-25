@@ -54,5 +54,7 @@
     "node": ">= 0.12.0"
   },
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.15.2"
+  }
 }
