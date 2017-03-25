@@ -1,5 +1,4 @@
 import Ember from 'ember';
-import _ from 'lodash';
 
 const { inject: { service }, Component } = Ember;
 
@@ -153,7 +152,7 @@ export default Ember.Component.extend({
   },
   redraw: function () {
     this.clearCanvas();
-    _.each(this.getAllPathsAsArray(), this.drawPath());
+    this.getAllPathsAsArray().forEach(this.drawPath());
   },
 
   // ====================================
