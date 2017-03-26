@@ -58,7 +58,8 @@ export default Ember.Component.extend({
     }
   },
   getAllPathsAsArray: function () {
-    return _.map(this.get('paths'));
+    const paths = this.get('paths');
+    return Object.keys(paths).map(key => paths[key]);
   },
   addToMyPath: function(x, y, drag) {
     const user = this.get('sessionAccount').get('account');
