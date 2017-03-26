@@ -173,7 +173,10 @@ export default Ember.Component.extend({
     const self = this;
     return function (data) {
       const { fbid } = data;
-      self.addOrReplacePath(fbid, null);
+      const paths = self.get('paths');
+      if (self.doesPathExistForId(fbid)) {
+        delete paths[fbid];
+      }
       self.redraw();
     }
   },
